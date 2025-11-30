@@ -2,7 +2,7 @@
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
 
-redirect_login();
+require_login(); 
 
 // Handle Hapus (jika status = aktif)
 if (isset($_GET['hapus']) && isset($_GET['id'])) {

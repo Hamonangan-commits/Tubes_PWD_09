@@ -3,7 +3,7 @@ require_once '../includes/auth.php';
 require_once '../includes/db.php';
 require_once '../includes/functions.php';
 
-redirect_login();
+require_login(); 
 
 $user = get_user_by_id($pdo, $_SESSION['user_id']);
 $photo_url = 'assets/uploads/profiles/' . $user['foto'];

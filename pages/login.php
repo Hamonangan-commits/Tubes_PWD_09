@@ -1,26 +1,40 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require_once '../includes/db.php';
 session_start();
 
+$error = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username']);
+    $input = trim($_POST['username']);
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-    $stmt->execute([$username, $username]);
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? OR username = ?");
+    $stmt->execute([$input, $input]);
     $user = $stmt->fetch();
 
-    if ($user && $user['is_active'] && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['is_admin'] = ($user['email'] === 'admin@rentalmobil.id');
-        header('Location: ' . ($_SESSION['is_admin'] ? '../admin/dashboard.php' : 'profile.php'));
-        exit();
+    if (!$user) {
+        $error = "Username atau email tidak ditemukan.";
+    } elseif (!$user['is_active']) {
+        $error = "Akun belum diaktivasi. Silakan cek email Anda.";
+    } elseif (!password_verify($password, $user['password'])) {
+        $error = "Password salah.";
     } else {
-        $error = "Login gagal. Pastikan akun sudah diaktivasi dan data benar.";
+        $_SESSION['user_id'] = $user['id'];
+        $is_admin = (strtolower(trim($user['email'])) === 'admin@rentalmobil.id');
+        $_SESSION['is_admin'] = $is_admin ? 1 : 0;
+
+        if ($is_admin) {
+            header('Location: ../admin/dashboard.php');
+            exit();
+        } else {
+            header('Location: profile.php');
+            exit();
+        }
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -31,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-light">
 <div class="container mt-5" style="max-width: 500px;">
     <h2 class="text-center mb-4">Login</h2>
-    <?php if (isset($error)): ?>
+    <?php if ($error): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
     <form method="POST">

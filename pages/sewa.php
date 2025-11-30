@@ -2,7 +2,7 @@
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
 
-redirect_login();
+require_login(); 
 
 // Ambil mobil tersedia
 $mobil = $pdo->query("SELECT * FROM mobil WHERE status = 'tersedia'")->fetchAll();

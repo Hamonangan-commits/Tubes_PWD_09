@@ -9,6 +9,6 @@ function require_login() {
 }
 
 function is_admin() {
-    return isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == true;
+    return !empty($_SESSION['is_admin']); // Cukup cek nilai truthy
 }
 ?>
