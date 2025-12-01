@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require_once '../includes/db.php';
 session_start();
 
@@ -17,21 +15,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$user) {
         $error = "Username atau email tidak ditemukan.";
     } elseif (!$user['is_active']) {
-        $error = "Akun belum diaktivasi. Silakan cek email Anda.";
+        $error = "Akun belum diaktivasi.";
     } elseif (!password_verify($password, $user['password'])) {
         $error = "Password salah.";
     } else {
         $_SESSION['user_id'] = $user['id'];
-        $is_admin = (strtolower(trim($user['email'])) === 'admin@rentalmobil.id');
+
+        $is_admin = ($user['username'] === 'admin');
         $_SESSION['is_admin'] = $is_admin ? 1 : 0;
 
         if ($is_admin) {
             header('Location: ../admin/dashboard.php');
-            exit();
         } else {
             header('Location: profile.php');
-            exit();
         }
+        exit();
     }
 }
 ?>

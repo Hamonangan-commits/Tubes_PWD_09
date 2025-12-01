@@ -3,7 +3,7 @@ require_once '../includes/auth.php';
 require_once '../includes/db.php';
 
 if (!is_admin()) {
-    header('Location: ../pages/login.php?error=unauthorized');
+    header('Location: ../pages/profile.php');
     exit();
 }
 ?>

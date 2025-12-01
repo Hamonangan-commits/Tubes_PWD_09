@@ -1,5 +1,8 @@
 <?php
-session_start();
+// includes/auth.php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 function require_login() {
     if (!isset($_SESSION['user_id'])) {
@@ -9,6 +12,5 @@ function require_login() {
 }
 
 function is_admin() {
-    return !empty($_SESSION['is_admin']); // Cukup cek nilai truthy
+    return !empty($_SESSION['is_admin']);
 }
-?>

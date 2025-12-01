@@ -7,25 +7,35 @@ if (!is_admin()) {
     exit();
 }
 
-// Update status transaksi (opsional: selesai, batalkan)
+// Handle update status
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $id = (int)$_POST['id'];
     $status = $_POST['status'];
+    
     if (in_array($status, ['aktif', 'selesai', 'dibatalkan'])) {
-        // Jika status berubah ke 'selesai' atau 'dibatalkan', kembalikan mobil ke 'tersedia'
+        // Ambil data transaksi
         $stmt = $pdo->prepare("SELECT mobil_id, status FROM transaksi WHERE id = ?");
         $stmt->execute([$id]);
         $trans = $stmt->fetch();
-        if ($trans && $trans['status'] === 'aktif' && in_array($status, ['selesai', 'dibatalkan'])) {
-            $pdo->prepare("UPDATE mobil SET status = 'tersedia' WHERE id = ?")->execute([$trans['mobil_id']]);
+
+        if ($trans) {
+            // Jika status berubah dari 'aktif' ke 'selesai/dibatalkan', kembalikan mobil
+            if ($trans['status'] === 'aktif' && in_array($status, ['selesai', 'dibatalkan'])) {
+                $pdo->prepare("UPDATE mobil SET status = 'tersedia' WHERE id = ?")
+                    ->execute([$trans['mobil_id']]);
+            }
+            // Update status transaksi
+            $pdo->prepare("UPDATE transaksi SET status = ? WHERE id = ?")
+                ->execute([$status, $id]);
         }
-        $pdo->prepare("UPDATE transaksi SET status = ? WHERE id = ?")->execute([$status, $id]);
+        
+        // Redirect kembali ke halaman ini
         header('Location: manage_transaksi.php');
         exit();
     }
 }
 
-// Ambil semua transaksi dengan join
+// Ambil data transaksi
 $stmt = $pdo->prepare("
     SELECT t.*, u.nama as nama_user, u.email, m.merek, m.model
     FROM transaksi t
@@ -36,7 +46,6 @@ $stmt = $pdo->prepare("
 $stmt->execute();
 $transaksi = $stmt->fetchAll();
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -75,15 +84,17 @@ $transaksi = $stmt->fetchAll();
                         <small><?= htmlspecialchars($t['email']) ?></small>
                     </td>
                     <td>
-                        <?= $t['merek'] && $t['model'] ? htmlspecialchars($t['merek'] . ' ' . $t['model']) : '<em>Mobil dihapus</em>' ?>
+                        <?= ($t['merek'] && $t['model']) 
+                            ? htmlspecialchars($t['merek'] . ' ' . $t['model']) 
+                            : '<em>Mobil dihapus</em>' ?>
                     </td>
-                    <td><?= $t['tgl_mulai'] ?><br>s/d<br><?= $t['tgl_selesai'] ?></td>
+                    <td><?= htmlspecialchars($t['tgl_mulai']) ?><br>s/d<br><?= htmlspecialchars($t['tgl_selesai']) ?></td>
                     <td><?= htmlspecialchars($t['lokasi_jemput']) ?></td>
                     <td>
                         <span class="badge bg-<?= 
                             $t['status'] === 'aktif' ? 'primary' : 
                             ($t['status'] === 'selesai' ? 'success' : 'danger')
-                        ?>"><?= ucfirst($t['status']) ?></span>
+                        ?>"><?= ucfirst(htmlspecialchars($t['status'])) ?></span>
                     </td>
                     <td>
                         <form method="POST" style="display:inline;">
