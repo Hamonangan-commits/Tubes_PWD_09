@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tambah'])) {
     $model = trim($_POST['model']);
     $harga = (int)$_POST['harga'];
     if ($merek && $model && $harga > 0) {
-        $stmt = $pdo->prepare("INSERT INTO mobil (merek, model, harga_per_hari) VALUES (?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO mobil (merek, model, harga_per_hari, status) VALUES (?, ?, ?, 'tersedia')");
         $stmt->execute([$merek, $model, $harga]);
         $message = "Mobil berhasil ditambahkan.";
     }
@@ -56,85 +56,139 @@ $mobil = $pdo->query("SELECT * FROM mobil ORDER BY id DESC")->fetchAll();
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Kelola Mobil - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Kelola Mobil</title>
+  <!-- Link ke CSS custom Anda -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="dashboard.php">Admin Dashboard</a>
-        <a class="btn btn-outline-light" href="../pages/logout.php">Logout</a>
-    </div>
-</nav>
 
-<div class="container mt-4">
-    <h2>Kelola Mobil</h2>
+<!-- Header -->
+<div class="header">
+  <a href="dashboard.php" class="logo" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
+    <div class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Admin Panel</h1>
+      <p>RentalKu Management</p>
+    </div>
+  </a>
+  <div class="user-actions">
+    <div class="user-info">
+      <span>Administrator</span>
+      <p>Admin User</p>
+    </div>
+    <a href="../logout.php" class="btn-logout">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+      </svg>
+      Keluar
+    </a>
+  </div>
+</div>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <div class="nav-item active">
+      <span class="icon">🚗</span>
+      Kelola Mobil <span class="badge"><?= count($mobil) ?></span>
+    </div>
+    <a href="manage_transaksi.php" class="nav-item">
+      <span class="icon">📅</span>
+      Transaksi <span class="badge">3</span>
+    </a>
+    <a href="manage_users.php" class="nav-item">
+      <span class="icon">👥</span>
+      Kelola Pengguna <span class="badge">5</span>
+    </a>
+  </div>
+
+  <!-- Konten Utama -->
+  <div class="container">
+    <h2 class="section-title">Manajemen Mobil</h2>
+    <p class="section-subtitle">Kelola daftar mobil rental Anda</p>
 
     <?php if (isset($_GET['pesan'])): ?>
-        <div class="alert alert-info"><?= htmlspecialchars($_GET['pesan']) ?></div>
+      <div style="background: #d1ecf1; color: #0c5460; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+        <?= htmlspecialchars($_GET['pesan']) ?>
+      </div>
     <?php endif; ?>
 
     <!-- Form Tambah Mobil -->
-    <div class="card mb-4">
-        <div class="card-header">Tambah Mobil Baru</div>
-        <div class="card-body">
-            <form method="POST">
-                <div class="row">
-                    <div class="col-md-4">
-                        <input type="text" name="merek" class="form-control" placeholder="Merek (e.g., Toyota)" required>
-                    </div>
-                    <div class="col-md-4">
-                        <input type="text" name="model" class="form-control" placeholder="Model (e.g., Avanza)" required>
-                    </div>
-                    <div class="col-md-3">
-                        <input type="number" name="harga" class="form-control" placeholder="Harga/Hari" min="1" required>
-                    </div>
-                    <div class="col-md-1">
-                        <button type="submit" name="tambah" class="btn btn-success">Tambah</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+    <div class="table-container" style="margin-bottom: 24px;">
+      <div style="padding: 16px; background: #f8f9fa; border-radius: 12px;">
+        <h5 style="margin-bottom: 16px; font-weight: 600;">Tambah Mobil Baru</h5>
+        <form method="POST" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+          <div>
+            <label style="font-size: 12px; color: #6c757d;">Merek</label>
+            <input type="text" name="merek" placeholder="Toyota" class="form-input" required>
+          </div>
+          <div>
+            <label style="font-size: 12px; color: #6c757d;">Model</label>
+            <input type="text" name="model" placeholder="Avanza" class="form-input" required>
+          </div>
+          <div>
+            <label style="font-size: 12px; color: #6c757d;">Harga/Hari</label>
+            <input type="number" name="harga" placeholder="0" min="1" class="form-input" required>
+          </div>
+          <div>
+            <button type="submit" name="tambah" class="btn-add">Tambah</button>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <!-- Daftar Mobil -->
-    <table class="table table-striped table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Mobil</th>
-                <th>Harga/Hari</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($mobil as $m): ?>
-                <tr>
-                    <td><?= $m['id'] ?></td>
-                    <td><?= htmlspecialchars($m['merek']) ?> <?= htmlspecialchars($m['model']) ?></td>
-                    <td>Rp <?= number_format($m['harga_per_hari']) ?></td>
-                    <td>
-                        <span class="badge bg-<?= $m['status'] === 'tersedia' ? 'success' : 'warning' ?>">
-                            <?= ucfirst($m['status']) ?>
-                        </span>
-                    </td>
-                    <td>
-                        <!-- Edit (modal atau form inline sederhana) -->
-                        <form method="POST" style="display:inline;">
-                            <input type="hidden" name="id" value="<?= $m['id'] ?>">
-                            <input type="text" name="merek" value="<?= htmlspecialchars($m['merek']) ?>" class="form-control d-inline" style="width:80px;" required>
-                            <input type="text" name="model" value="<?= htmlspecialchars($m['model']) ?>" class="form-control d-inline" style="width:80px;" required>
-                            <input type="number" name="harga" value="<?= $m['harga_per_hari'] ?>" class="form-control d-inline" style="width:100px;" min="1" required>
-                            <button type="submit" name="edit" class="btn btn-sm btn-primary">Simpan</button>
-                        </form>
-                        <a href="?hapus=<?= $m['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus mobil ini?')">Hapus</a>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-</div>
+    <!-- Tabel Mobil -->
+    <div class="table-container">
+      <div class="table-header">
+        <div>ID</div>
+        <div>Mobil</div>
+        <div>Harga/hari</div>
+        <div>Status</div>
+        <div>Aksi</div>
+      </div>
+
+      <?php if (empty($mobil)): ?>
+        <div class="table-row">
+          <div class="table-cell" colspan="5" style="text-align: center; padding: 20px; color: #6c757d;">
+            Belum ada mobil.
+          </div>
+        </div>
+      <?php else: ?>
+        <?php foreach ($mobil as $m): ?>
+          <div class="table-row">
+            <div class="table-cell"><?= htmlspecialchars($m['id']) ?></div>
+            <div class="table-cell">
+              <?= htmlspecialchars($m['merek']) ?> <?= htmlspecialchars($m['model']) ?>
+            </div>
+            <div class="table-cell">Rp <?= number_format($m['harga_per_hari'], 0, ',', '.') ?></div>
+            <div class="table-cell">
+              <span class="status-badge <?= $m['status'] === 'tersedia' ? 'aktif' : 'nonaktif' ?>">
+                <?= ucfirst($m['status']) ?>
+              </span>
+            </div>
+            <div class="table-cell action-group">
+              <form method="POST" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <input type="hidden" name="id" value="<?= $m['id'] ?>">
+                <input type="text" name="merek" value="<?= htmlspecialchars($m['merek']) ?>" class="form-input-sm" style="width: 80px;" required>
+                <input type="text" name="model" value="<?= htmlspecialchars($m['model']) ?>" class="form-input-sm" style="width: 80px;" required>
+                <input type="number" name="harga" value="<?= $m['harga_per_hari'] ?>" class="form-input-sm" style="width: 100px;" min="1" required>
+                <button type="submit" name="edit" class="btn-update">Simpan</button>
+                <a href="?hapus=<?= $m['id'] ?>" class="btn-delete" onclick="return confirm('Hapus mobil ini?')">Hapus</a>
+              </form>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <!-- Help Button -->
+  <div class="help-button">?</div>
+
 </body>
 </html>

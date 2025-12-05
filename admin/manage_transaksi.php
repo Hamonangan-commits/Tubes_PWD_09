@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     }
 }
 
-// Ambil data transaksi
+// Ambil data transaksi — PAKAI t.* SESUAI PERMINTAAN ANDA
 $stmt = $pdo->prepare("
     SELECT t.*, u.nama as nama_user, u.email, m.merek, m.model
     FROM transaksi t
@@ -45,72 +45,178 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute();
 $transaksi = $stmt->fetchAll();
+
+// Hitung statistik
+$stats = [
+    'aktif' => 0,
+    'selesai' => 0,
+    'total' => count($transaksi)
+];
+
+foreach ($transaksi as $t) {
+    if ($t['status'] === 'aktif') $stats['aktif']++;
+    if ($t['status'] === 'selesai') $stats['selesai']++;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <title>Kelola Transaksi - Admin</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - RentalKu Management</title>
+  <!-- Link ke CSS di folder lain -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
 </head>
 <body>
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="dashboard.php">Admin Dashboard</a>
-        <a class="btn btn-outline-light" href="../pages/logout.php">Logout</a>
-    </div>
-</nav>
 
-<div class="container mt-4">
-    <h2>Manajemen Transaksi</h2>
-    <table class="table table-striped table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Pengguna</th>
-                <th>Mobil</th>
-                <th>Tanggal</th>
-                <th>Lokasi</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($transaksi as $t): ?>
-                <tr>
-                    <td><?= $t['id'] ?></td>
-                    <td>
-                        <?= htmlspecialchars($t['nama_user']) ?><br>
-                        <small><?= htmlspecialchars($t['email']) ?></small>
-                    </td>
-                    <td>
-                        <?= ($t['merek'] && $t['model']) 
-                            ? htmlspecialchars($t['merek'] . ' ' . $t['model']) 
-                            : '<em>Mobil dihapus</em>' ?>
-                    </td>
-                    <td><?= htmlspecialchars($t['tgl_mulai']) ?><br>s/d<br><?= htmlspecialchars($t['tgl_selesai']) ?></td>
-                    <td><?= htmlspecialchars($t['lokasi_jemput']) ?></td>
-                    <td>
-                        <span class="badge bg-<?= 
-                            $t['status'] === 'aktif' ? 'primary' : 
-                            ($t['status'] === 'selesai' ? 'success' : 'danger')
-                        ?>"><?= ucfirst(htmlspecialchars($t['status'])) ?></span>
-                    </td>
-                    <td>
-                        <form method="POST" style="display:inline;">
-                            <input type="hidden" name="id" value="<?= $t['id'] ?>">
-                            <select name="status" class="form-select form-select-sm d-inline" style="width:auto;" required>
-                                <option value="aktif" <?= $t['status'] === 'aktif' ? 'selected' : '' ?>>Aktif</option>
-                                <option value="selesai" <?= $t['status'] === 'selesai' ? 'selected' : '' ?>>Selesai</option>
-                                <option value="dibatalkan" <?= $t['status'] === 'dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
-                            </select>
-                            <button type="submit" name="update_status" class="btn btn-sm btn-outline-secondary">Update</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+  <!-- Header -->
+<div class="header">
+  <a href="dashboard.php" class="logo" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
+    <div class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Admin Panel</h1>
+      <p>RentalKu Management</p>
+    </div>
+  </a>
+  <div class="user-actions">
+    <div class="user-info">
+      <span>Administrator</span>
+      <p>Admin User</p>
+    </div>
+    <a href="../logout.php" class="btn-logout">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+      </svg>
+      Keluar
+    </a>
+  </div>
 </div>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <a href="manage_mobil.php" class="nav-item">
+      <span class="icon">🚗</span>
+      Kelola Mobil <span class="badge">6</span>
+    </a>
+    <div class="nav-item active">
+      <span class="icon">📅</span>
+      Transaksi <span class="badge">3</span>
+    </div>
+    <a href="manage_users.php" class="nav-item">
+      <span class="icon">👥</span>
+      Kelola Pengguna <span class="badge">5</span>
+    </a>
+  </div>
+
+  <!-- Konten Utama -->
+  <div class="container">
+    <h2 class="section-title">Manajemen Transaksi</h2>
+    <p class="section-subtitle">Kelola semua transaksi rental mobil</p>
+
+    <!-- Statistik Cards -->
+    <div class="stats-cards">
+      <div class="stat-card green">
+        <div class="info">
+          <div class="label">Sewa Aktif</div>
+          <div class="value"><?= $stats['aktif'] ?></div>
+        </div>
+        <div class="icon">✅</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="info">
+          <div class="label">Selesai</div>
+          <div class="value"><?= $stats['selesai'] ?></div>
+        </div>
+        <div class="icon">✅</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="info">
+          <div class="label">Total Transaksi</div>
+          <div class="value"><?= $stats['total'] ?></div>
+        </div>
+        <div class="icon">✅</div>
+      </div>
+    </div>
+
+    <!-- Tabel Transaksi -->
+    <div class="table-container">
+      <div class="table-header">
+        <div>ID</div>
+        <div>Pengguna</div>
+        <div>Mobil</div>
+        <div>Tanggal</div>
+        <div>Lokasi</div>
+        <div>Status</div>
+        <div>Aksi</div>
+      </div>
+
+      <?php if (empty($transaksi)): ?>
+        <div class="table-row">
+          <div class="table-cell" colspan="7" style="text-align: center; padding: 20px; color: #6c757d;">
+            Tidak ada transaksi.
+          </div>
+        </div>
+      <?php else: ?>
+        <?php foreach ($transaksi as $t): ?>
+          <div class="table-row">
+            <div class="table-cell"><?= htmlspecialchars($t['id']) ?></div>
+            <div class="table-cell user-info">
+              <span class="name"><?= htmlspecialchars($t['nama_user'] ?? '–') ?></span>
+              <span class="email"><?= htmlspecialchars($t['email'] ?? '–') ?></span>
+            </div>
+            <div class="table-cell">
+              <?= htmlspecialchars(($t['merek'] ?? '') . ' ' . ($t['model'] ?? '')) ?>
+            </div>
+            <div class="table-cell dates">
+              <span>
+                <?= !empty($t['tgl_mulai']) ? date('Y-m-d', strtotime($t['tgl_mulai'])) : '–' ?>
+              </span>
+              <span>s/d</span>
+              <span>
+                <?= !empty($t['tgl_selesai']) ? date('Y-m-d', strtotime($t['tgl_selesai'])) : '–' ?>
+              </span>
+            </div>
+            <div class="table-cell location">
+              Lat: <?= number_format($t['lat'] ?? 0, 4) ?>,
+              Lng: <?= number_format($t['lng'] ?? 0, 4) ?>
+            </div>
+            <div class="table-cell">
+              <?php
+                $status_class = match($t['status'] ?? 'aktif') {
+                  'aktif' => 'aktif',
+                  'selesai' => 'selesai',
+                  'dibatalkan' => 'selesai',
+                  default => 'aktif'
+                };
+              ?>
+              <span class="status-badge <?= $status_class ?>">
+                <?= ucfirst($t['status'] ?? 'Aktif') ?>
+              </span>
+            </div>
+            <div class="table-cell action-group">
+              <form method="POST" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                <input type="hidden" name="id" value="<?= $t['id'] ?>">
+                <select name="status" class="select-status">
+                  <option value="aktif" <?= ($t['status'] ?? '') === 'aktif' ? 'selected' : '' ?>>Aktif</option>
+                  <option value="selesai" <?= ($t['status'] ?? '') === 'selesai' ? 'selected' : '' ?>>Selesai</option>
+                  <option value="dibatalkan" <?= ($t['status'] ?? '') === 'dibatalkan' ? 'selected' : '' ?>>Dibatalkan</option>
+                </select>
+                <button type="submit" name="update_status" value="1" class="btn-update">Update</button>
+              </form>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      <?php endif; ?>
+    </div>
+  </div>
+
+  <!-- Help Button -->
+  <div class="help-button">?</div>
+
 </body>
 </html>
