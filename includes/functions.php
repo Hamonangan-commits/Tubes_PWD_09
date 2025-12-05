@@ -9,7 +9,7 @@ function upload_profile_photo($file, $user_id) {
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
     
     if (!in_array($ext, $allowed) || $file['error'] !== 0) return false;
-    if ($file['size'] > 2 * 1024 * 1024) return false; // max 2MB
+    if ($file['size'] > 2 * 1024 * 1024) return false; 
 
     $filename = $user_id . '.jpg'; // simpan sebagai user_id.jpg
     $path = $upload_dir . $filename;

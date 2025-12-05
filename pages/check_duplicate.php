@@ -1,5 +1,5 @@
 <?php
-// check_duplicate.php (letakkan di root folder proyek)
+// check_duplicate.php 
 require_once 'includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
