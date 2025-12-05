@@ -64,8 +64,8 @@ $mobil = $pdo->query("SELECT * FROM mobil ORDER BY id DESC")->fetchAll();
 </head>
 <body>
 
-<!-- Header -->
-<div class="header">
+  <!-- Header -->
+  <div class="header">
   <a href="dashboard.php" class="logo" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
     <div class="icon">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -82,7 +82,7 @@ $mobil = $pdo->query("SELECT * FROM mobil ORDER BY id DESC")->fetchAll();
       <span>Administrator</span>
       <p>Admin User</p>
     </div>
-    <a href="../logout.php" class="btn-logout">
+    <a href="../pages/logout.php" class="btn-logout">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
         <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
       </svg>
@@ -93,6 +93,10 @@ $mobil = $pdo->query("SELECT * FROM mobil ORDER BY id DESC")->fetchAll();
 
   <!-- Navbar -->
   <div class="navbar">
+    <a href="dashboard.php" class="nav-item">
+    <span class="icon">📊</span>
+      Dashboard <span class="badge">1</span>
+    </a>
     <div class="nav-item active">
       <span class="icon">🚗</span>
       Kelola Mobil <span class="badge"><?= count($mobil) ?></span>
@@ -109,8 +113,7 @@ $mobil = $pdo->query("SELECT * FROM mobil ORDER BY id DESC")->fetchAll();
 
   <!-- Konten Utama -->
   <div class="container">
-    <h2 class="section-title">Manajemen Mobil</h2>
-    <p class="section-subtitle">Kelola daftar mobil rental Anda</p>
+    <h2 class="section-title">Kelola Mobil</h2>
 
     <?php if (isset($_GET['pesan'])): ?>
       <div style="background: #d1ecf1; color: #0c5460; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
@@ -118,22 +121,22 @@ $mobil = $pdo->query("SELECT * FROM mobil ORDER BY id DESC")->fetchAll();
       </div>
     <?php endif; ?>
 
-    <!-- Form Tambah Mobil -->
-    <div class="table-container" style="margin-bottom: 24px;">
+    <!-- Form Tambah Mobil Baru -->
+    <div class="table-container" style="margin-bottom: 20px;">
       <div style="padding: 16px; background: #f8f9fa; border-radius: 12px;">
         <h5 style="margin-bottom: 16px; font-weight: 600;">Tambah Mobil Baru</h5>
         <form method="POST" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
           <div>
-            <label style="font-size: 12px; color: #6c757d;">Merek</label>
+            <label style="font-size: 12px; color: #6c757d;">Merek (e.g., Toyota)</label>
             <input type="text" name="merek" placeholder="Toyota" class="form-input" required>
           </div>
           <div>
-            <label style="font-size: 12px; color: #6c757d;">Model</label>
+            <label style="font-size: 12px; color: #6c757d;">Model (e.g., Avanza)</label>
             <input type="text" name="model" placeholder="Avanza" class="form-input" required>
           </div>
           <div>
             <label style="font-size: 12px; color: #6c757d;">Harga/Hari</label>
-            <input type="number" name="harga" placeholder="0" min="1" class="form-input" required>
+            <input type="number" name="harga" placeholder="350000" min="1" class="form-input" required>
           </div>
           <div>
             <button type="submit" name="tambah" class="btn-add">Tambah</button>
@@ -147,7 +150,7 @@ $mobil = $pdo->query("SELECT * FROM mobil ORDER BY id DESC")->fetchAll();
       <div class="table-header">
         <div>ID</div>
         <div>Mobil</div>
-        <div>Harga/hari</div>
+        <div>Harga/Hari</div>
         <div>Status</div>
         <div>Aksi</div>
       </div>

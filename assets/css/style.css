@@ -496,3 +496,150 @@ body {
   background: #ffc107;
   color: #212529;
 }
+
+/* Tombol Tambah Mobil */
+.btn-add-mobil {
+  background: #5e40e7;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+
+.btn-add-mobil:hover {
+  background: #4a30d8;
+}
+
+/* Tombol Edit & Hapus */
+.btn-edit {
+  background: transparent;
+  border: none;
+  color: #007bff;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-edit:hover {
+  color: #0056b3;
+}
+
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: #dc3545;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-delete:hover {
+  color: #c82333;
+}
+
+/* Modal Overlay */
+.modal-backdrop {
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+/* Status Badge untuk Tidak Tersedia */
+.status-badge.nonaktif {
+  background: #ffc107;
+  color: #212529;
+}
+
+/* Form Input */
+.form-input {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #5e40e7;
+  box-shadow: 0 0 0 2px rgba(94, 64, 231, 0.2);
+}
+
+.form-input-sm {
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+/* Tombol Tambah */
+.btn-add {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-add:hover {
+  background: #218838;
+}
+
+/* Tombol Edit */
+.btn-update {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-update:hover {
+  background: #0056b3;
+}
+
+/* Tombol Hapus */
+.btn-delete {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+}
+
+/* Status Badge untuk Tidak Tersedia */
+.status-badge.nonaktif {
+  background: #ffc107;
+  color: #212529;
+}

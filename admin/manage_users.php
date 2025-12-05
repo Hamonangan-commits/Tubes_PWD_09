@@ -68,7 +68,7 @@ $users = $pdo->query("SELECT * FROM users ORDER BY created_at DESC")->fetchAll()
       <span>Administrator</span>
       <p>Admin User</p>
     </div>
-    <a href="../logout.php" class="btn-logout">
+    <a href="../pages/logout.php" class="btn-logout">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
         <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
       </svg>
@@ -79,6 +79,10 @@ $users = $pdo->query("SELECT * FROM users ORDER BY created_at DESC")->fetchAll()
 
   <!-- Navbar -->
   <div class="navbar">
+    <a href="dashboard.php" class="nav-item">
+    <span class="icon">📊</span>
+      Dashboard <span class="badge">1</span>
+    </a>
     <a href="manage_mobil.php" class="nav-item">
       <span class="icon">🚗</span>
       Kelola Mobil <span class="badge">6</span>
