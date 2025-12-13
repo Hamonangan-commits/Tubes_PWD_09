@@ -68,19 +68,19 @@ if ($result) {
   <div class="navbar">
     <div class="nav-item active">
       <span class="icon">📊</span>
-      Dashboard <span class="badge">1</span>
+      Dashboard
     </div>
     <a href="manage_mobil.php" class="nav-item">
       <span class="icon">🚗</span>
-      Kelola Mobil <span class="badge"><?= $total_mobil ?></span>
+      Kelola Mobil
     </a>
     <a href="manage_transaksi.php" class="nav-item">
       <span class="icon">📅</span>
-      Transaksi <span class="badge"><?= $total_transaksi ?></span>
+      Transaksi
     </a>
     <a href="manage_users.php" class="nav-item">
       <span class="icon">👥</span>
-      Kelola Pengguna <span class="badge"><?= $total_pengguna ?></span>
+      Kelola Pengguna
     </a>
   </div>
 
@@ -124,9 +124,9 @@ if ($result) {
     <!-- Quick Actions -->
     <div class="table-container" style="margin-top: 24px;">
       <div style="padding: 16px;">
-        <h3 class="section-title" style="font-size: 18px; margin-bottom: 12px;">Aksi Cepat</h3>
+        <h3 class="section-title" style="font-size: 18px; margin-bottom: 12px;">Laporan</h3>
         <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-          <a href="manage_mobil.php" class="btn-add-mobil" style="text-decoration: none;">
+          <!-- <a href="manage_mobil.php" class="btn-add-mobil" style="text-decoration: none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
               <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
             </svg>
@@ -142,7 +142,7 @@ if ($result) {
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
               <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
             </svg>
-            Kelola Transaksi
+            Kelola Transaksi -->
           </a>
           <a href="generate_pdf.php" class="btn-add-mobil" style="background: #ffc107; color: #212529; text-decoration: none;">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">

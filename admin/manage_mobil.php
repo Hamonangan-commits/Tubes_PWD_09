@@ -95,19 +95,19 @@ $mobil = $pdo->query("SELECT * FROM mobil ORDER BY id DESC")->fetchAll();
   <div class="navbar">
     <a href="dashboard.php" class="nav-item">
     <span class="icon">📊</span>
-      Dashboard <span class="badge">1</span>
+      Dashboard
     </a>
     <div class="nav-item active">
       <span class="icon">🚗</span>
-      Kelola Mobil <span class="badge"><?= count($mobil) ?></span>
+      Kelola Mobil
     </div>
     <a href="manage_transaksi.php" class="nav-item">
       <span class="icon">📅</span>
-      Transaksi <span class="badge">3</span>
+      Transaksi
     </a>
     <a href="manage_users.php" class="nav-item">
       <span class="icon">👥</span>
-      Kelola Pengguna <span class="badge">5</span>
+      Kelola Pengguna
     </a>
   </div>
 

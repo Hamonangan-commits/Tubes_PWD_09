@@ -81,19 +81,19 @@ $users = $pdo->query("SELECT * FROM users ORDER BY created_at DESC")->fetchAll()
   <div class="navbar">
     <a href="dashboard.php" class="nav-item">
     <span class="icon">📊</span>
-      Dashboard <span class="badge">1</span>
+      Dashboard
     </a>
     <a href="manage_mobil.php" class="nav-item">
       <span class="icon">🚗</span>
-      Kelola Mobil <span class="badge">6</span>
+      Kelola Mobil
     </a>
     <a href="manage_transaksi.php" class="nav-item">
       <span class="icon">📅</span>
-      Transaksi <span class="badge">3</span>
+      Transaksi
     </a>
     <div class="nav-item active">
       <span class="icon">👥</span>
-      Kelola Pengguna <span class="badge">5</span>
+      Kelola Pengguna
     </div>
   </div>
 

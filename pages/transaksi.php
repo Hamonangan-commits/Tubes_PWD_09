@@ -4,6 +4,22 @@ require_once '../includes/db.php';
 
 require_login();
 
+// Handle pembatalan transaksi
+if (isset($_GET['batal']) && isset($_GET['id'])) {
+    $id = (int)$_GET['id'];
+    $stmt = $pdo->prepare("SELECT status, mobil_id FROM transaksi WHERE id = ? AND user_id = ?");
+    $stmt->execute([$id, $_SESSION['user_id']]);
+    $trans = $stmt->fetch();
+    if ($trans && $trans['status'] === 'aktif') {
+        // Update status jadi 'dibatalkan'
+        $pdo->prepare("UPDATE transaksi SET status = 'dibatalkan' WHERE id = ?")->execute([$id]);
+        // Kembalikan status mobil ke 'tersedia'
+        $pdo->prepare("UPDATE mobil SET status = 'tersedia' WHERE id = ?")->execute([$trans['mobil_id']]);
+        header('Location: transaksi.php?pesan=dibatalkan');
+        exit();
+    }
+}
+
 // Ambil transaksi pengguna
 $stmt = $pdo->prepare("
     SELECT t.*, m.merek, m.model 
@@ -14,20 +30,6 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$_SESSION['user_id']]);
 $transaksi = $stmt->fetchAll();
-
-// Handle hapus (jika status aktif)
-if (isset($_GET['hapus']) && isset($_GET['id'])) {
-    $id = (int)$_GET['id'];
-    $stmt = $pdo->prepare("SELECT status, mobil_id FROM transaksi WHERE id = ? AND user_id = ?");
-    $stmt->execute([$id, $_SESSION['user_id']]);
-    $trans = $stmt->fetch();
-    if ($trans && $trans['status'] === 'aktif') {
-        $pdo->prepare("DELETE FROM transaksi WHERE id = ?")->execute([$id]);
-        $pdo->prepare("UPDATE mobil SET status = 'tersedia' WHERE id = ?")->execute([$trans['mobil_id']]);
-        header('Location: transaksi.php?pesan=dihapus');
-        exit();
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -66,23 +68,22 @@ if (isset($_GET['hapus']) && isset($_GET['id'])) {
 <body>
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
-    <span class="navbar-brand d-flex align-items-center">
-        <img src="../assets/images/logo_user.png" alt="RentalKu Logo" style="width: 50px; height: 50px; object-fit: contain;">
-        <span class="ms-2">RentalKu</span>
-    </span>
-    <div class="ms-auto">
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                <img src="../assets/images/user_avatar.png" alt="User Avatar" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;">
-                <span>user</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="profile.php">Profil Saya</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Keluar</a></li>
-            </ul>
+        <span class="navbar-brand d-flex align-items-center">
+            <img src="../assets/images/logo_user.png" alt="RentalKu Logo" style="width: 50px; height: 50px; object-fit: contain;">
+            <span class="ms-2">RentalKu</span>
+        </span>
+        <div class="ms-auto">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                    <i class="bi bi-person"></i> user
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="profile.php">Profil Saya</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Keluar</a></li>
+                </ul>
+            </div>
         </div>
-    </div>
     </div>
 </nav>
 
@@ -96,11 +97,11 @@ if (isset($_GET['hapus']) && isset($_GET['id'])) {
         </li>
     </ul>
 
-    <h4>Riwayat Transaksi</h4>
-
-    <?php if (isset($_GET['pesan'])): ?>
+    <?php if (isset($_GET['pesan']) && $_GET['pesan'] === 'dibatalkan'): ?>
         <div class="alert alert-success">Transaksi berhasil dibatalkan.</div>
     <?php endif; ?>
+
+    <h4>Riwayat Transaksi</h4>
 
     <div class="table-responsive">
         <table class="table table-bordered">
@@ -120,13 +121,32 @@ if (isset($_GET['hapus']) && isset($_GET['id'])) {
                         <td><?= htmlspecialchars($t['tgl_mulai']) ?> s/d <?= htmlspecialchars($t['tgl_selesai']) ?></td>
                         <td><?= htmlspecialchars($t['lokasi_jemput']) ?></td>
                         <td>
-                            <span class="badge <?= $t['status'] === 'aktif' ? 'badge-aktif' : 'badge-selesai' ?>">
-                                <?= ucfirst($t['status']) ?>
-                            </span>
+                            <?php
+                            $status_class = '';
+                            $status_text = '';
+                            switch ($t['status']) {
+                                case 'aktif':
+                                    $status_class = 'bg-danger';
+                                    $status_text = 'Aktif';
+                                    break;
+                                case 'dibatalkan':
+                                    $status_class = 'bg-secondary';
+                                    $status_text = 'Dibatalkan';
+                                    break;
+                                case 'selesai':
+                                    $status_class = 'bg-success';
+                                    $status_text = 'Selesai';
+                                    break;
+                                default:
+                                    $status_class = 'bg-light text-dark';
+                                    $status_text = ucfirst($t['status']);
+                            }
+                            ?>
+                            <span class="badge <?= $status_class ?>"><?= $status_text ?></span>
                         </td>
                         <td>
                             <?php if ($t['status'] === 'aktif'): ?>
-                                <a href="?hapus=1&id=<?= $t['id'] ?>" class="btn btn-batalkan btn-sm" onclick="return confirm('Batalkan sewa?')">Batalkan</a>
+                                <a href="?batal=1&id=<?= $t['id'] ?>" class="btn btn-batalkan btn-sm" onclick="return confirm('Batalkan sewa?')">Batalkan</a>
                             <?php else: ?>
                                 -
                             <?php endif; ?>

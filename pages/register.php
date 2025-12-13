@@ -12,24 +12,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? OR username = ?");
-    $stmt->execute([$email, $username]);
-    if ($stmt->fetch()) {
-        $error = "Email atau username sudah digunakan.";
+    // Validasi input
+    if (empty($nama) || empty($email) || empty($username) || empty($password)) {
+        $error = "Semua field wajib diisi.";
     } else {
-        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $pdo->prepare("INSERT INTO users (nama, email, username, password, is_active) VALUES (?, ?, ?, ?, 0)");
-        $stmt->execute([$nama, $email, $username, $hashed_password]);
-        $user_id = $pdo->lastInsertId();
-
-        $token = generate_token();
-        $stmt = $pdo->prepare("INSERT INTO user_activations (user_id, token) VALUES (?, ?)");
-        $stmt->execute([$user_id, $token]);
-
-        if (send_activation_email($email, $token)) {
-            $message = "Registrasi berhasil! Silakan cek email untuk aktivasi.";
+        // Cek duplikat
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? OR username = ?");
+        $stmt->execute([$email, $username]);
+        if ($stmt->fetch()) {
+            $error = "Email atau username sudah digunakan.";
         } else {
-            $message = "Registrasi berhasil, tapi gagal kirim email aktivasi.";
+            $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+            try {
+                $stmt = $pdo->prepare("INSERT INTO users (nama, email, username, password, is_active) VALUES (?, ?, ?, ?, 0)");
+                $stmt->execute([$nama, $email, $username, $hashed_password]);
+                $user_id = $pdo->lastInsertId();
+
+                $token = generate_token();
+                $stmt = $pdo->prepare("INSERT INTO user_activations (user_id, token) VALUES (?, ?)");
+                $stmt->execute([$user_id, $token]);
+
+                if (send_activation_email($email, $token)) {
+                    $message = "Registrasi berhasil! Silakan cek email untuk aktivasi.";
+                } else {
+                    $message = "Registrasi berhasil, tapi gagal kirim email aktivasi.";
+                }
+            } catch (PDOException $e) {
+                // Jika terjadi duplicate karena race condition
+                if (str_contains($e->getMessage(), 'Duplicate entry')) {
+                    $error = "Email atau username sudah digunakan.";
+                } else {
+                    $error = "Terjadi kesalahan sistem. Silakan coba lagi.";
+                    error_log("Registrasi error: " . $e->getMessage());
+                }
+            }
         }
     }
 }

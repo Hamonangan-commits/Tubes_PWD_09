@@ -108,19 +108,19 @@ foreach ($transaksi as $t) {
   <div class="navbar">
     <a href="dashboard.php" class="nav-item">
     <span class="icon">📊</span>
-      Dashboard <span class="badge">1</span>
+      Dashboard
     </a>
     <a href="manage_mobil.php" class="nav-item">
       <span class="icon">🚗</span>
-      Kelola Mobil <span class="badge">6</span>
+      Kelola Mobil
     </a>
     <div class="nav-item active">
       <span class="icon">📅</span>
-      Transaksi <span class="badge">3</span>
+      Transaksi
     </div>
     <a href="manage_users.php" class="nav-item">
       <span class="icon">👥</span>
-      Kelola Pengguna <span class="badge">5</span>
+      Kelola Pengguna
     </a>
   </div>
 
